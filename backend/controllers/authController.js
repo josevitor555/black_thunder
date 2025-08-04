@@ -65,20 +65,15 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
 
     // Log the request
-    const { email, password } = req.body;
+    const { email, username } = req.body;
 
     try {
 
         // Check if user exists
-        const [rows] = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
+        const [rows] = await db.query('SELECT * FROM usuarios WHERE email = ? AND username = ?', [email, username]);
+        
         if (rows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Check if password is correct
-        const isMatch = await bcrypt.compare(password, rows[0].password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Senha incorreta' });
         }
 
         // Generate token

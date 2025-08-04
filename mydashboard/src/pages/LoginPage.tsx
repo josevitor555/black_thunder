@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import backgroundImage from "../images/thunder_logo.png";
 import { Lock, UserPlus, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
+// URL da API
+const apiUrl = import.meta.env.VITE_API_URL;
+
+
 
 const LoginPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -10,15 +17,97 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Login attempt:', { name, email });
-    };
+    const navigate = useNavigate();
 
-    const handleSignup = (e: React.FormEvent) => {
+    const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Signup attempt:', { name, email, password });
-    };
+
+        // Validate inputs
+        if (!name || !email) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${apiUrl}/api/login`, {
+                email: email,
+                username: name
+            });
+            
+            console.log("Login successful:", response.data);
+
+            // Save token and user data to localStorage
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("userInfo", JSON.stringify(response.data.user));
+
+            // Redirect to home
+            navigate("/home");
+
+        } catch (error: unknown) {
+            console.log("Error to login", error);
+            
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response: { status: number; data: { message?: string } } };
+                
+                console.log("Error response data:", axiosError.response.data);
+                console.log("Error response status:", axiosError.response.status);
+                
+                if (axiosError.response.status === 401) {
+                    alert("Email ou senha incorretos. Tente novamente.");
+                } else if (axiosError.response.status === 404) {
+                    alert("Usuário não encontrado. Verifique seu email.");
+                } else {
+                    alert(`Erro no servidor: ${axiosError.response.data.message || 'Tente novamente.'}`);
+                }
+            } else if (error && typeof error === 'object' && 'request' in error) {
+                console.log("Error request:", error);
+                alert("Erro de conexão. Verifique se o servidor está rodando.");
+            } else {
+                console.log("Error message:", error);
+                alert("Erro inesperado. Tente novamente.");
+            }
+        }
+    }
+
+    const handleSignUp = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Validate inputs
+        if (!name || !email || !password) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${apiUrl}/api/register`, {
+                username: name,
+                email: email,
+                password: password
+            });
+
+            // Save token and user data to localStorage
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("userInfo", JSON.stringify(response.data.user));
+
+            // Navigate to home
+            navigate("/home");
+
+        } catch (error: unknown) {
+            console.log("Error to register user: ", error);
+            
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response: { status: number; data: { message?: string } } };
+                
+                if (axiosError.response.status === 409) {
+                    alert("Email ou nome de usuário já existe. Tente novamente.");
+                } else {
+                    alert(`Erro no servidor: ${axiosError.response.data.message || 'Tente novamente.'}`);
+                }
+            } else {
+                alert("Erro inesperado. Tente novamente.");
+            }
+        }
+    }
 
     const handleGoogleLogin = () => {
         console.log('Google login clicked');
@@ -71,9 +160,9 @@ const LoginPage = () => {
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="w-full max-w-xl px-12 mt-4 relative z-10 mb-10"
                     >
-                        <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-6">
+                        <form onSubmit={isLogin ? handleSignIn : handleSignUp} className="space-y-6">
 
-                            {/* Name Input */}
+                            {/* Name Input - For both Login and Signup */}
                             <div className="space-y-2">
                                 <label className="block text-[#FFE0C2] text-lg font-medium">
                                     Seu nome
@@ -148,7 +237,7 @@ const LoginPage = () => {
                                             placeholder="Digite sua senha aqui"
                                             className="w-full h-14 bg-white/5 border border-white/10 rounded-lg px-4 pr-12 text-[#CCCCCC] text-base font-light placeholder-[#CCCCCC] backdrop-blur-xl focus:outline-none focus:border-[#FFE0C2]/30 transition-all duration-300"
                                         />
-                                        
+
                                         {/* Eye Icon */}
                                         <button
                                             type="button"
