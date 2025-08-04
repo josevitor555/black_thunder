@@ -88,7 +88,7 @@ DELETE /api/delete-task/:id   → Delete task by ID
 | AI Layer  | shadcn-ui-server + Framelink Figma MCP |
 
 
-### getting started
+### Getting started
 
 ```plaintext
 # Frontend
