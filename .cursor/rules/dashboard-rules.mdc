@@ -1,0 +1,31 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+
+Planning Rule  
+Quando for planejado um novo componente ou funcionalidade no dashboard MCP:  
+- Usar categorias para agrupar os projetos (ex: Websites, Sistemas Internos, Landing Pages, etc.)  
+- Priorizar com base em urgência ou impacto (usar tags como `alta-prioridade`, `média`, `baixa`)  
+- Definir o tipo de projeto (ex: Front-end Only, Fullstack, IA + UI, MVP)
+
+Usage Rule  
+Durante o desenvolvimento:  
+- Utilizar componentes do ShadCN sempre que possível  
+- Quando for necessário mais flexibilidade visual, usar Material UI em conjunto  
+- Dividir os projetos por status: `em desenvolvimento`, `em teste`, `finalizado`, `em aprovação`
+
+Implementation Rule  
+Na hora de implementar:  
+- Primeiro testar os blocos de UI com exemplos no MCP  
+- Reutilizar componentes já existentes antes de criar novos  
+- Se for criar algo novo, documentar a lógica em `mcp-store.md` ou `implementation.md`  
+- Aplicar sempre tipagem estrita com TypeScript (`Props`, `Context`, `Hooks`)
+
+Observações  
+- Interface deve ser construída com base em experiência visual fluida (UX first)  
+- A IA deve sugerir padrões se houver ambiguidade nas tarefas do usuário  
+- O humano revisor tem prioridade final sobre decisões ambíguas
+

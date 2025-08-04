@@ -1,0 +1,73 @@
+/* Classes utilitárias para uso das variáveis de cor */
+.bg-background { background: var(--background); }
+.bg-card { background: var(--card); }
+.bg-primary { background: var(--primary); }
+.bg-secondary { background: var(--secondary); }
+.bg-muted { background: var(--muted); }
+.bg-accent { background: var(--accent); }
+.bg-popover { background: var(--popover); }
+.bg-destructive { background: var(--destructive); }
+.bg-sidebar { background: var(--sidebar); }
+
+.text-foreground { color: var(--foreground); }
+.text-card-foreground { color: var(--card-foreground); }
+.text-primary { color: var(--primary); }
+.text-primary-foreground { color: var(--primary-foreground); }
+.text-secondary { color: var(--secondary); }
+.text-secondary-foreground { color: var(--secondary-foreground); }
+.text-muted { color: var(--muted); }
+.text-muted-foreground { color: var(--muted-foreground); }
+.text-accent { color: var(--accent); }
+.text-accent-foreground { color: var(--accent-foreground); }
+.text-popover-foreground { color: var(--popover-foreground); }
+.text-destructive { color: var(--destructive); }
+.text-destructive-foreground { color: var(--destructive-foreground); }
+.text-sidebar-foreground { color: var(--sidebar-foreground); }
+.text-sidebar-primary { color: var(--sidebar-primary); }
+.text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+.text-sidebar-accent { color: var(--sidebar-accent); }
+.text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+
+.border-border { border-color: var(--border); }
+.border-input { border-color: var(--input); }
+.border-sidebar-border { border-color: var(--sidebar-border); }
+
+.ring-ring { box-shadow: 0 0 0 2px var(--ring); }
+
+/* Botões customizados */
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.75rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.btn-primary:hover {
+  background: var(--primary-foreground);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Badges customizadas */
+.badge-success {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.badge-warning {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.badge-danger {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+.badge-default {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}

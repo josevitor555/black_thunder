@@ -1,0 +1,3 @@
+Username: caang2024119tads0019
+Password: HWoF0t8qVDaUvX8C
+Connection String: mongodb+srv://caang2024119tads0019:HWoF0t8qVDaUvX8C@blackthunder.nj6fxna.mongodb.net/?retryWrites=true&w=majority&appName=BlackThunder
