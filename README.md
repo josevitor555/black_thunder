@@ -1,57 +1,47 @@
 ### Project Management Dashboard
 
-A modern task/project management dashboard built with **React**, **TypeScript**, and **Tailwind CSS**, designed to help **freelancers and agencies** organize and prioritize client projects. It includes smart filtering, priority tagging, smooth UI animations, and a powerful AI-assisted context system powered by **MCP**.
+A modern, sleek task/project management dashboard built with React, TypeScript, and Tailwind CSS. Designed for freelancers and agencies who like to keep their chaos organized — with style, brains, and a dash of contextual AI via MCP.
 
 ---
 
-### What is MCP?
+### What Makes It Special?
 
-To build this project, we used a protocol called **MCP Server (Model Context Protocol)** — think of it as a living manual or design library for the AI. It acts as a contextual brain: every time you mention `@modal`, `@button`, or `@card`, the assistant instantly understands what UI component to render and how to behave.
-
-Feels like magic? It’s not — it’s **contextual intelligence**.
-
-> It's not just autocomplete. It's co-pilot UI design powered by shared understanding.
-
----
-
-### MVP Features
-
-- ✅ Add / update / delete tasks  
-- ✅ Filter by priority and status  
-- ✅ Paginated task list  
-- ✅ Animated modal for task creation  
-- ✅ Component system using `shadcn/ui` + `Lucide` icons  
-- ✅ Clean and responsive UI (Tailwind CSS v4 + Framer Motion)
+- Smooth, responsive UI with Framer Motion animations
+- Full backend integration with Node.js, MySQL, and JWT
+- Two powerful MCPs activated:
+  - shadcn-ui-server: intelligent context for all shadcn/ui components
+  - Framelink Figma MCP: yes, it reads Figma and translates it into code (magic? maybe)
 
 ---
 
-### Tech Stack
+### What the Heck is MCP?
 
-| Layer     | Technology                          |
-|-----------|-------------------------------------|
-| Frontend  | React + TypeScript + Vite           |
-| UI        | Tailwind CSS + shadcn/ui + Lucide   |
-| Animation | Framer Motion                       |
-| Backend   | Node.js *(Coming soon)*             |
-| AI Layer  | MCP Server (Model Context Protocol) |
+MCP (Model Context Protocol) is like the AI’s brain for your project.
+Forget boring autocomplete — this thing understands your components. Mention @modal, @card, or @task, and the assistant knows exactly what you're talking about and how to help.
+
+> 💡 Think of it as a design partner who doesn’t forget things, doesn’t sleep, and doesn’t mess up component names.
 
 ---
 
-### More on MCP
+### Active MCPs
 
-The **MCP Server** is a central component within the Model Context Protocol (MCP) ecosystem. It acts as a bridge between AI models and your project’s tools, codebase, and data sources.
-
-In this project, MCP enables:
-
-- **Creating layouts** based on design tokens and `shadcn/ui` presets  
-- **Context-awareness** for components, styling, and user interactions  
-- **Component references** via `@mentions` (e.g., `@card`, `@task`, `@priorityBadge`)
-
-Each MCP server is unique, tailored to the specific needs of the project it serves.
+- shadcn-ui-server: serves up examples, structure, and docs from shadcn/ui
+- Framelink Figma MCP: brings Figma prototypes to life in your code
 
 ---
 
-### Authentication *(Coming Soon)*
+### Features
+
+- [x] Add / update / delete tasks
+- [x] Filter tasks by priority and status 
+- [x] Paginated task lis t
+- [x] Animated modal for task creation
+- [x] Reusable components (shadcn/ui, Lucide Icons)
+- [x] Clean and responsive UI (Tailwind v4 + Framer Motion)
+
+---
+
+### Authentication (Node.js + MySQL + JWT)
 
 User authentication will be handled via:
 
@@ -61,13 +51,13 @@ User authentication will be handled via:
 **Endpoints:**
 
 ```http
-POST   /api/register-user     → Register new user  
+POST   /api/register-user     → Register a new user  
 POST   /api/login-user        → Log in  
-DELETE /api/logout-account    → Delete user session  
+DELETE /api/logout-account    → End session  
 GET    /api/home              → Protected route (JWT required)
 ```
 
-### Project / Task Management (MongoDB)
+### Task Management (MongoDB)
 
 ```http
 POST   /api/register-task     → Create a new task  
@@ -80,15 +70,25 @@ DELETE /api/delete-task/:id   → Delete task by ID
 
 ```plaintext
 /project-root
-│
 ├── backend/      → Node.js backend (auth + DB logic)
-├── frontend/     → React dashboard (UI & logic)
-└── README.md     → This file
+├── frontend/     → React dashboard (UI + logic + MCP)
+└── README.md     → This file, obviously
 ```
 
 ---
 
-### Getting Start
+### Stack used
+
+| Layer     | Tech Used                              |
+| --------- | -------------------------------------- |
+| Frontend  | React + TypeScript + Vite              |
+| UI        | Tailwind CSS + shadcn/ui + Lucide      |
+| Animation | Framer Motion                          |
+| Backend   | Node.js + MySQL + JWT                  |
+| AI Layer  | shadcn-ui-server + Framelink Figma MCP |
+
+
+### Getting started
 
 ```plaintext
 # Frontend
@@ -97,12 +97,21 @@ npm install
 npm run dev
 ```
 
-### Image Project
-
-<img width="1919" height="910" alt="Captura de tela 2025-08-01 232415" src="https://github.com/user-attachments/assets/161af6a8-7ed9-44ed-9d79-e2e587e67c0f" />
+```plaintext
+# Backend
+cd backend
+npm install
+npm run dev
+```
 
 ---
 
+### Image Project
+
+<img width="1919" height="910" alt="Captura de tela 2025-08-01 232415" src="https://github.com/user-attachments/assets/d0e5753b-3f99-41dc-9905-a3c5e0f22c9d" />
+
 ### Author
 
-Made with 🔥, code, and a touch of AI by José Vitor
+Built with caffeine, code, and a little AI sorcery by José Vitor.
+If it works? Of course. If it looks good? Hell yeah.
+And yes — it speaks MCP.
