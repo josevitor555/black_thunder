@@ -106,7 +106,7 @@ npm run dev
 
 ### Image Project
 
-<img width="1919" height="910" alt="Captura de tela 2025-08-01 232415" src="https://github.com/user-attachments/assets/161af6a8-7ed9-44ed-9d79-e2e587e67c0f" />
+<img width="1919<img width="1919" height="910" alt="Captura de tela 2025-08-01 232415" src="https://github.com/user-attachments/assets/d0e5753b-3f99-41dc-9905-a3c5e0f22c9d" />
 
 ---
 
