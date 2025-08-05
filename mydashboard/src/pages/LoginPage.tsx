@@ -4,11 +4,11 @@ import backgroundImage from "../images/thunder_logo.png";
 import { Lock, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import Warning from '../components/Warning';
+import { useWarning } from '../hooks/useWarning';
 
 // URL da API
 const apiUrl = import.meta.env.VITE_API_URL;
-
-
 
 const LoginPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -18,13 +18,53 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
+    const { warningState, closeWarning, showMissingFields, showInvalidEmail, showWeakPassword, showWarning } = useWarning();
+
+    // Função para validar email
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    // Função para validar senha
+    const validatePassword = (password: string): { isValid: boolean; requirements: string[] } => {
+        const requirements: string[] = [];
+        
+        if (password.length < 6) {
+            requirements.push('Mínimo de 6 caracteres');
+        }
+        if (!/[A-Z]/.test(password)) {
+            requirements.push('Pelo menos uma letra maiúscula');
+        }
+        if (!/[a-z]/.test(password)) {
+            requirements.push('Pelo menos uma letra minúscula');
+        }
+        if (!/\d/.test(password)) {
+            requirements.push('Pelo menos um número');
+        }
+
+        return {
+            isValid: requirements.length === 0,
+            requirements
+        };
+    };
 
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate inputs
-        if (!name || !email) {
-            alert("Por favor, preencha todos os campos.");
+        // Validar campos obrigatórios
+        const missingFields: string[] = [];
+        if (!name.trim()) missingFields.push('Nome é obrigatório');
+        if (!email.trim()) missingFields.push('Email é obrigatório');
+
+        if (missingFields.length > 0) {
+            showMissingFields(missingFields);
+            return;
+        }
+
+        // Validar formato do email
+        if (!validateEmail(email)) {
+            showInvalidEmail();
             return;
         }
 
@@ -53,18 +93,63 @@ const LoginPage = () => {
                 console.log("Error response status:", axiosError.response.status);
                 
                 if (axiosError.response.status === 401) {
-                    alert("Email ou senha incorretos. Tente novamente.");
+                    showWarning(
+                        'error',
+                        'Credenciais inválidas',
+                        'Email ou nome de usuário incorretos. Verifique suas informações e tente novamente.',
+                        [
+                            'Verifique se o email está correto',
+                            'Verifique se o nome de usuário está correto',
+                            'Tente novamente ou recupere sua conta'
+                        ]
+                    );
                 } else if (axiosError.response.status === 404) {
-                    alert("Usuário não encontrado. Verifique seu email.");
+                    showWarning(
+                        'error',
+                        'Usuário não encontrado',
+                        'Não foi possível encontrar uma conta com essas informações.',
+                        [
+                            'Verifique se o email está correto',
+                            'Verifique se você já possui uma conta',
+                            'Crie uma nova conta se necessário'
+                        ]
+                    );
                 } else {
-                    alert(`Erro no servidor: ${axiosError.response.data.message || 'Tente novamente.'}`);
+                    showWarning(
+                        'error',
+                        'Erro no servidor',
+                        'Ocorreu um erro inesperado. Tente novamente mais tarde.',
+                        [
+                            axiosError.response.data.message || 'Erro interno do servidor',
+                            'Verifique sua conexão com a internet',
+                            'Tente novamente em alguns minutos'
+                        ]
+                    );
                 }
             } else if (error && typeof error === 'object' && 'request' in error) {
                 console.log("Error request:", error);
-                alert("Erro de conexão. Verifique se o servidor está rodando.");
+                showWarning(
+                    'error',
+                    'Erro de conexão',
+                    'Não foi possível conectar ao servidor. Verifique sua conexão.',
+                    [
+                        'Verifique se o servidor está rodando',
+                        'Verifique sua conexão com a internet',
+                        'Tente novamente em alguns minutos'
+                    ]
+                );
             } else {
                 console.log("Error message:", error);
-                alert("Erro inesperado. Tente novamente.");
+                showWarning(
+                    'error',
+                    'Erro inesperado',
+                    'Ocorreu um erro inesperado. Tente novamente.',
+                    [
+                        'Erro interno do sistema',
+                        'Tente novamente em alguns minutos',
+                        'Se o problema persistir, entre em contato com o suporte'
+                    ]
+                );
             }
         }
     }
@@ -72,9 +157,27 @@ const LoginPage = () => {
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate inputs
-        if (!name || !email || !password) {
-            alert("Por favor, preencha todos os campos.");
+        // Validar campos obrigatórios
+        const missingFields: string[] = [];
+        if (!name.trim()) missingFields.push('Nome é obrigatório');
+        if (!email.trim()) missingFields.push('Email é obrigatório');
+        if (!password.trim()) missingFields.push('Senha é obrigatória');
+
+        if (missingFields.length > 0) {
+            showMissingFields(missingFields);
+            return;
+        }
+
+        // Validar formato do email
+        if (!validateEmail(email)) {
+            showInvalidEmail();
+            return;
+        }
+
+        // Validar força da senha
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+            showWeakPassword(passwordValidation.requirements);
             return;
         }
 
@@ -85,12 +188,26 @@ const LoginPage = () => {
                 password: password
             });
 
+            // Show success message
+            showWarning(
+                'info',
+                'Conta criada com sucesso!',
+                'Sua conta foi criada e você já pode começar a usar o BlackThunder.',
+                [
+                    'Bem-vindo ao BlackThunder!',
+                    'Você será redirecionado para o dashboard',
+                    'Comece a criar e gerenciar seus projetos'
+                ]
+            );
+
             // Save token and user data to localStorage
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("userInfo", JSON.stringify(response.data.user));
 
-            // Navigate to home
-            navigate("/home");
+            // Navigate to home after a short delay
+            setTimeout(() => {
+                navigate("/home");
+            }, 2000);
 
         } catch (error: unknown) {
             console.log("Error to register user: ", error);
@@ -99,22 +216,67 @@ const LoginPage = () => {
                 const axiosError = error as { response: { status: number; data: { message?: string } } };
                 
                 if (axiosError.response.status === 409) {
-                    alert("Email ou nome de usuário já existe. Tente novamente.");
+                    showWarning(
+                        'error',
+                        'Conta já existe',
+                        'Já existe uma conta com esse email ou nome de usuário.',
+                        [
+                            'Tente usar um email diferente',
+                            'Tente usar um nome de usuário diferente',
+                            'Faça login se já possui uma conta'
+                        ]
+                    );
                 } else {
-                    alert(`Erro no servidor: ${axiosError.response.data.message || 'Tente novamente.'}`);
+                    showWarning(
+                        'error',
+                        'Erro no cadastro',
+                        'Não foi possível criar sua conta. Tente novamente.',
+                        [
+                            axiosError.response.data.message || 'Erro interno do servidor',
+                            'Verifique suas informações',
+                            'Tente novamente em alguns minutos'
+                        ]
+                    );
                 }
             } else {
-                alert("Erro inesperado. Tente novamente.");
+                showWarning(
+                    'error',
+                    'Erro inesperado',
+                    'Ocorreu um erro inesperado durante o cadastro.',
+                    [
+                        'Erro interno do sistema',
+                        'Tente novamente em alguns minutos',
+                        'Se o problema persistir, entre em contato com o suporte'
+                    ]
+                );
             }
         }
     }
 
     const handleGoogleLogin = () => {
-        console.log('Google login clicked');
+        showWarning(
+            'info',
+            'Login com Google',
+            'Funcionalidade em desenvolvimento. Em breve você poderá fazer login com sua conta Google.',
+            [
+                'Esta funcionalidade será implementada em breve',
+                'Por enquanto, use o login tradicional',
+                'Aguarde as próximas atualizações'
+            ]
+        );
     };
 
     const handleXLogin = () => {
-        console.log('X login clicked');
+        showWarning(
+            'info',
+            'Login com X (Twitter)',
+            'Funcionalidade em desenvolvimento. Em breve você poderá fazer login com sua conta X.',
+            [
+                'Esta funcionalidade será implementada em breve',
+                'Por enquanto, use o login tradicional',
+                'Aguarde as próximas atualizações'
+            ]
+        );
     };
 
     const toggleMode = () => {
@@ -371,6 +533,16 @@ const LoginPage = () => {
 
                 </div>
             </div>
+
+            {/* Warning Modal */}
+            <Warning
+                isOpen={warningState.isOpen}
+                onClose={closeWarning}
+                type={warningState.type}
+                title={warningState.title}
+                message={warningState.message}
+                details={warningState.details}
+            />
         </div>
     );
 };

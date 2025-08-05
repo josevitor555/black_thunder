@@ -325,16 +325,6 @@ const MainApp = () => {
                 />
             )}
 
-            {/* Com animação */}
-            {/* <AnimatePresence>
-        {showUploadModal && (
-          <ImageUploadModal
-            onClose={() => setShowUploadModal(false)}
-            onUpload={handleFileUpload}
-          />
-        )}
-      </AnimatePresence> */}
-
             {/* Sem animação */}
             {showUploadModal && (
                 <ImageUploadModal

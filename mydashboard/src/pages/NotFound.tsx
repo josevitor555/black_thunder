@@ -47,7 +47,7 @@ const NotFound = () => {
             {/* Main Content */}
             <main className="flex-1 flex flex-col items-center justify-center">
                 {/* 404 Number */}
-                <div className="flex items-center justify-center mb-8">
+                <div className="flex items-center justify-center mb-3">
                     <span className="text-[#FFE0C2] text-8xl font-normal leading-[1.302]">
                         4
                     </span>
@@ -62,7 +62,7 @@ const NotFound = () => {
                 {/* Back to Home Button */}
                 <button
                     onClick={handleBackToHome}
-                    className="bg-[#393028] text-[#FFE0C2] px-16 py-4 rounded-[38px] text-2xl font-semibold hover:bg-[#4a3a35] transition-colors duration-200 cursor-pointer"
+                    className="bg-[#393028] text-[#FFE0C2] px-16 py-3 rounded-[38px] text-2xl font-light hover:bg-[#4a3a35] transition-colors duration-200 cursor-pointer"
                 >
                     Back to Home
                 </button>
