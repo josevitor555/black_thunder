@@ -84,7 +84,7 @@ DELETE /api/delete-task/:id   → Delete task by ID
 | Frontend  | React + TypeScript + Vite              |
 | UI        | Tailwind CSS + shadcn/ui + Lucide      |
 | Animation | Framer Motion                          |
-| Backend   | Node.js + MySQL + JWT                  |
+| Backend   | Node.js + MySQL + JWT + MongoDB        |
 | AI Layer  | shadcn-ui-server + Framelink Figma MCP |
 
 
