@@ -91,14 +91,14 @@ DELETE /api/delete-task/:id   → Delete task by ID
 ### Getting started
 
 ```plaintext
-# Frontend
+# backend
 cd frontend
 npm install
 npm run dev
 ```
 
 ```plaintext
-# Backend
+# mydashboard (frontend)
 cd backend
 npm install
 npm run dev
