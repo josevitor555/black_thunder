@@ -139,7 +139,7 @@ const MainApp = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                 <div className='flex flex-col'>
                     <h1 className='text-3xl font-bold'>Bem vindo de volta!</h1>
-                    <p className='text-lg font-semibol'>Aqui está a lista de tarefas este mês.</p>
+                    <p className='text-lg font-semibol'>Crie e gerencie suas tarefas com TASK'S!</p>
                 </div>
                 <button className="btn-primary whitespace-nowrap cursor-pointer" onClick={openNewTaskModal}>Nova Tarefa</button>
             </div>

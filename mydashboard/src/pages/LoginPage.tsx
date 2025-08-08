@@ -192,9 +192,9 @@ const LoginPage = () => {
             showWarning(
                 'info',
                 'Conta criada com sucesso!',
-                'Sua conta foi criada e você já pode começar a usar o BlackThunder.',
+                'Sua conta foi criada e você já pode começar a usar o TASKS.',
                 [
-                    'Bem-vindo ao BlackThunder!',
+                    'Bem-vindo ao TASKS!',
                     'Você será redirecionado para o dashboard',
                     'Comece a criar e gerenciar seus projetos'
                 ]
@@ -304,7 +304,7 @@ const LoginPage = () => {
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-[#FFE0C2]">
-                                {isLogin ? 'Bem-vindo ao BlackThunder' : 'Junte-se ao BlackThunder'}
+                                {isLogin ? 'Bem-vindo ao TASKS' : 'Junte-se ao TASKS'}
                             </h1>
                             <p className="text-[#FFE0C2] text-lg font-light mt-0 opacity-70">
                                 {isLogin

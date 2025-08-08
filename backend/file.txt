@@ -1,3 +1,5 @@
-Username: caang2024119tads0019
-Password: HWoF0t8qVDaUvX8C
-Connection String: mongodb+srv://caang2024119tads0019:HWoF0t8qVDaUvX8C@blackthunder.nj6fxna.mongodb.net/?retryWrites=true&w=majority&appName=BlackThunder
+Username: koservitor123
+Password: F4Qe78u9b51kUd66
+Connection String: mongodb+srv://koservitor123:F4Qe78u9b51kUd66@cluster0.geehbl3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+mongodb+srv://koservitor123:<F4Qe78u9b51kUd66>@cluster0.geehbl3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
