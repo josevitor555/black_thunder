@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import backgroundImage from "../images/thunder_logo.png";
+import backgroundImage from "../images/tasks_logo_no_bg.png";
 import { Lock, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -462,6 +462,7 @@ const LoginPage = () => {
                                 Entrar com Conta X
                             </motion.button>
                         </div>
+
                     </motion.div>
                 </div>
 
@@ -477,7 +478,7 @@ const LoginPage = () => {
                         <img
                             src={backgroundImage}
                             alt="Lightning"
-                            className="max-w-full w-full h-[380px] object-contain"
+                            className="max-w-full w-full h-[340px] object-contain"
                         />
                     </motion.div>
 

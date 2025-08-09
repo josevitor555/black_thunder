@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import TasksLogo from '../images/black_thunder_logo.png';
-import NotFoundImage from '../images/ChatGPT Image 8_08_2025, 10_40_33.png';
+import NotFoundImage from '../images/tasks_logo_no_bg.png';
+import { motion } from 'framer-motion';
 
 const NotFound = () => {
     const navigate = useNavigate();
@@ -11,9 +12,9 @@ const NotFound = () => {
 
     return (
         <div className="h-screen bg-[#171717] flex flex-col overflow-hidden">
-            {/* Header */}
+            
             <header className="flex justify-between items-center px-12 py-6">
-                {/* Logo */}
+
                 <div className="flex items-center">
                     <img
                         src={TasksLogo}
@@ -44,8 +45,9 @@ const NotFound = () => {
 
             {/* Main Content */}
             <main className="grid grid-cols-1 md:grid-cols-2 flex-1 overflow-hidden">
-                {/* Coluna Esquerda */}
+                
                 <div className="flex flex-col items-center justify-center">
+
                     {/* 404 Number */}
                     <div className="flex items-center justify-center mb-3">
                         <span className="text-[#FFE0C2] text-8xl font-normal leading-[1.302]">
@@ -69,14 +71,24 @@ const NotFound = () => {
                 </div>
 
                 {/* Coluna Direita */}
-                <div className="bg-[#FFE0C2] flex flex-col items-center justify-center p-8 text-center overflow-hidden">
-                    <img
-                        src={NotFoundImage}
-                        alt="Not Found"
-                        className="max-h-[60vh] w-auto object-contain rounded-lg"
-                    />
-                    <h2 className="mt-6 text-3xl font-light text-[#171717]">
-                        Manage your tasks like a lightning bolt
+                <div className="flex flex-col items-center justify-center p-8 text-center overflow-hidden">
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.6 }}
+                    >
+
+                        <img
+                            src={NotFoundImage}
+                            alt="Not Found"
+                            className="max-h-[60vh] w-auto object-contain rounded-lg"
+                        />
+
+                    </motion.div>
+                    
+                    <h2 className="mt-6 text-3xl font-light text-[#FFE0C2]">
+                        Gerencie suas tarefas como um raio!
                     </h2>
                 </div>
             </main>

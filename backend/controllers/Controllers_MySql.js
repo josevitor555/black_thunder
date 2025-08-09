@@ -47,7 +47,7 @@ export const register = async (req, res) => {
 
         // Get the created user data
         const [userRows] = await db.query("SELECT id, username, email, created_at FROM usuarios WHERE id = ?", [result.insertId]);
-        
+
         // Send response with user data
         res.status(201).json({
             message: "User successfully registered",
@@ -73,7 +73,7 @@ export const login = async (req, res) => {
 
         // Check if user exists
         const [rows] = await db.query('SELECT * FROM usuarios WHERE email = ? AND username = ?', [email, username]);
-        
+
         if (rows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -83,7 +83,7 @@ export const login = async (req, res) => {
         console.log("Generated token: ", token);
 
         // Send response with user data
-        res.status(200).json({ 
+        res.status(200).json({
             token,
             user: {
                 id: rows[0].id,
@@ -153,13 +153,3 @@ export const home = async (req, res) => {
     }
 };
 
-// Routes for task management (With MongoDB)
-
-// 1. Create a new task 
-export const createTask = async (req, res) => {}
-
-// 2. Update an existing task  
-export const updateTask = async (req, res) => {}
-
-// 3. Delete task by ID
-export const deleteTask = async (req, res) => {}

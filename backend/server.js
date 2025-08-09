@@ -10,13 +10,20 @@ import express from "express";
 import cors from "cors";
 
 // Import routs
-import authRoutes from "./routes/routes.js";
+import authRoutes from "./routes/routesMySql.js";
+import taskRoutes from "./routes/routesMongodb.js";
 
 // Import db
 import { db } from "./database/db.js";
 
 // Import mongodb connection function
 import connectMongo from "./connectMongo/Mongo_connection.js";
+
+// Import MongoDB schemas (IMPORTANTE: deve vir antes das rotas)
+import "./ModelSchemas/ClientSchema.js";
+import "./ModelSchemas/categorySchema.js";
+import "./ModelSchemas/StatusProjectSchemas.js";
+import "./ModelSchemas/ProjectSchema.js";
 
 // Create express app
 const app = express();
@@ -32,6 +39,7 @@ app.use(express.urlencoded({ extended: true}));
 
 // Define main endpoint for the others endpoints
 app.use("/api", authRoutes); // http://localhost:3000/api/login (e.g)
+app.use("/api/tasks", taskRoutes); // http://localhost:3000/api/tasks/create-task (e.g)
 
 // Route Text for Connect to MySql
 app.get("/connect-mysql", async(req, res) => {
