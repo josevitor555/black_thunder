@@ -1,18 +1,18 @@
 import * as React from 'react';
 import type { Projeto } from '../lib/projects-mock';
 import Updronw from './Updronw';
-
+import { clientService } from '../services/clientService';
 import { X } from 'lucide-react';
-
 import { motion, AnimatePresence } from 'framer-motion';
+import type { CreateTaskData, UpdateTaskData, Task } from '../services/taskService';
 
 const categorias = [
   'Blog', 'E-commerce', 'Portfólio', 'Site institucional', 'Landing Page', 'Dashboard administrativo', 'Outros'
 ];
 
 const statusDropdown = [
-  { value: 'planejamento', label: 'Planejamento' },
-  { value: 'iniciado', label: 'Iniciado' },
+  { value: 'backlog', label: 'Backlog' },
+  { value: 'todo', label: 'A Fazer' },
   { value: 'in_progress', label: 'Em Progresso' },
   { value: 'done', label: 'Finalizado' },
   { value: 'paused', label: 'Pausado' },
@@ -33,8 +33,9 @@ function getToday() {
 interface ModalNovaTarefaProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (novoProjeto: Projeto) => void;
   editingTask?: Projeto | null;
+  createTask: (taskData: CreateTaskData) => Promise<Task>;
+  updateTask: (id: string, taskData: UpdateTaskData) => Promise<Task>;
 }
 
 const modalVariants = {
@@ -45,7 +46,7 @@ const modalVariants = {
     scale: 1,
     transition: {
       duration: 0.18,
-      ease: [0.42, 0, 0.58, 1]
+      ease: "easeOut"
     },
   },
   exit: {
@@ -54,80 +55,130 @@ const modalVariants = {
     scale: 0.95,
     transition: {
       duration: 0.18,
-      ease: [0.42, 0, 1, 1],
+      ease: "easeIn",
     },
   },
-};
+} as const;
 
-const ModalNovaTarefa: React.FC<ModalNovaTarefaProps> = ({ open, onClose, onAdd, editingTask }) => {
+const ModalNovaTarefa: React.FC<ModalNovaTarefaProps> = ({ open, onClose, editingTask, createTask, updateTask }) => {
+  
   const [form, setForm] = React.useState({
     nome: '',
     cliente: '',
     descricao: '',
     categoria: categorias[0],
     prioridade: 'media',
-    status: 'planejamento',
+    status: 'backlog',
     dataCriacao: getToday(),
     dataEntrega: '',
     link: '',
     notas: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [successMessage, setSuccessMessage] = React.useState('');
+
   React.useEffect(() => {
     if (editingTask) {
+      console.log('Modal recebeu editingTask:', editingTask);
+      console.log('Cliente do editingTask:', editingTask.cliente);
       setForm({
         nome: editingTask.nome || '',
         cliente: editingTask.cliente || '',
         descricao: editingTask.descricao || '',
         categoria: editingTask.categoria || categorias[0],
         prioridade: editingTask.prioridade || 'media',
-        status: editingTask.status || 'planejamento',
+        status: editingTask.status || 'backlog',
         dataCriacao: editingTask.dataCriacao || getToday(),
         dataEntrega: editingTask.dataEntrega || '',
         link: editingTask.link || '',
         notas: editingTask.notas || '',
       });
     } else {
+      console.log('Modal abrindo para nova tarefa');
       setForm({
         nome: '',
         cliente: '',
         descricao: '',
         categoria: categorias[0],
         prioridade: 'media',
-        status: 'planejamento',
+        status: 'backlog',
         dataCriacao: getToday(),
         dataEntrega: '',
         link: '',
         notas: '',
       });
     }
-  }, [editingTask, open]);
+  }, [editingTask]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const clienteValue = editingTask ? form.cliente.replace(/^@+/, '') : form.cliente;
+    
+    try {
+      setIsSubmitting(true);
+      setSuccessMessage('');
+      
+      console.log('Iniciando criação/busca do cliente:', form.cliente);
+      
+      // Primeiro, criar ou encontrar o cliente
+      const cliente = await clientService.createOrFindClient({
+        nome: form.cliente
+      });
+      
+      console.log('Cliente encontrado/criado:', cliente);
+      console.log('Cliente ID:', cliente._id);
 
-    const novoProjeto: Projeto = {
-      id: editingTask?.id || `TASK-${Math.floor(Math.random() * 9000 + 1000)}`,
-      nome: form.nome,
-      cliente: clienteValue,
-      avatarUrl: editingTask?.avatarUrl,
-      categoria: form.categoria,
-      status: form.status as Projeto['status'],
-      prioridade: form.prioridade as Projeto['prioridade'],
-      dataCriacao: form.dataCriacao,
-      dataEntrega: form.dataEntrega,
-      descricao: form.descricao,
-      link: form.link,
-      notas: form.notas,
-    };
+      if (editingTask) {
+        console.log('Atualizando tarefa existente:', editingTask.id);
+        // Atualizar tarefa existente
+        await updateTask(editingTask.id, {
+          nome: form.nome,
+          clienteId: cliente._id, // Usar o ID real do cliente
+          categoria: form.categoria,
+          status: form.status as 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled' | 'paused' | 'revisao',
+          prioridade: form.prioridade as 'baixa' | 'media' | 'alta',
+          descricao: form.descricao,
+          dataEntrega: form.dataEntrega ? new Date(form.dataEntrega) : undefined,
+          link: form.link,
+          notas: form.notas,
+        });
+        setSuccessMessage('Tarefa atualizada com sucesso!');
+      } else {
+        console.log('Criando nova tarefa com clienteId:', cliente._id);
+        // Criar nova tarefa
+        await createTask({
+          nome: form.nome,
+          clienteId: cliente._id, // Usar o ID real do cliente
+          categoria: form.categoria,
+          status: form.status as 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled' | 'paused' | 'revisao',
+          prioridade: form.prioridade as 'baixa' | 'media' | 'alta',
+          descricao: form.descricao,
+          dataEntrega: form.dataEntrega ? new Date(form.dataEntrega) : undefined,
+          link: form.link,
+          notas: form.notas,
+        });
+        setSuccessMessage('Tarefa criada com sucesso!');
+      }
 
-    onAdd(novoProjeto);
-    onClose();
+      console.log('Tarefa salva com sucesso!');
+      
+      // Aguardar um pouco para mostrar a mensagem de sucesso
+      setTimeout(() => {
+        onClose();
+        setSuccessMessage('');
+      }, 1500);
+      
+    } catch (err) {
+      console.error('Erro ao salvar tarefa:', err);
+      setSuccessMessage('Erro ao salvar tarefa. Tente novamente.');
+      // O erro já é tratado pelo hook
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -158,6 +209,17 @@ const ModalNovaTarefa: React.FC<ModalNovaTarefaProps> = ({ open, onClose, onAdd,
                 <X className="h-5 w-5 text-popover-foreground" />
               </button>
             </div>
+
+            {/* Mensagem de sucesso ou erro */}
+            {successMessage && (
+              <div className={`p-3 rounded text-sm font-medium ${
+                successMessage.includes('Erro') 
+                  ? 'bg-red-100 text-red-700 border border-red-300' 
+                  : 'bg-green-100 text-green-700 border border-green-300'
+              }`}>
+                {successMessage}
+              </div>
+            )}
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Nome do Projeto</label>
@@ -207,7 +269,15 @@ const ModalNovaTarefa: React.FC<ModalNovaTarefaProps> = ({ open, onClose, onAdd,
             </div>
 
             <div className="flex justify-end gap-2 mt-2">
-              <button type="submit" className="btn-primary cursor-pointer">{editingTask ? 'Salvar alterações' : 'Salvar'}</button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`btn-primary w-full py-4 px-4 rounded font-medium transition ${
+                  isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                }`}
+              >
+                {isSubmitting ? 'Salvando...' : (editingTask ? 'Atualizar Tarefa' : 'Criar Tarefa')}
+              </button>
             </div>
           </motion.form>
         </motion.div>

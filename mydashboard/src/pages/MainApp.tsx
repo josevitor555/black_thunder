@@ -3,7 +3,6 @@ import { useState } from 'react';
 import '../App.css';
 import '../index.css';
 
-import { projetosMock } from '../lib/projects-mock';
 import { Edit, User, Trash2 } from 'lucide-react';
 
 import { Badge } from '../lib/Badge';
@@ -17,6 +16,8 @@ import Avatar from '../components/Avatar';
 import ModalNovaTarefa from '../components/ModalNovaTarefa';
 import Updronw from '../components/Updronw';
 import { ImageUploadModal } from '../components/ImageUserUpload';
+import { useTasks } from '../hooks/useTasks';
+import type { Task } from '../services/taskService';
 
 function getStatusVariant(status: string) {
     switch (status) {
@@ -59,14 +60,45 @@ function filterProjetos(projetos: Projeto[], search: string, status: string, pri
 }
 
 const MainApp = () => {
+    const { tasks, loading, error, deleteTask, fetchTasks, createTask, updateTask } = useTasks();
 
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
     const [prioridade, setPrioridade] = useState('');
-    const [projetos, setProjetos] = useState(projetosMock);
     const [editingTask, setEditingTask] = useState<Projeto | null>(null);
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [uploadTargetProjeto, setUploadTargetProjeto] = useState<Projeto | null>(null);
+
+    // Converter tasks do backend para o formato Projeto do frontend
+    const projetos = tasks.map((task: Task) => {
+        // Determinar o nome do cliente
+        let nomeCliente = '';
+        if (typeof task.clienteId === 'string') {
+            // Se clienteId é uma string (ID), usar um placeholder temporário
+            nomeCliente = `Cliente ${task.clienteId.slice(-4)}`;
+        } else if (task.clienteId && typeof task.clienteId === 'object' && 'nome' in task.clienteId) {
+            // Se clienteId é um objeto populado, usar o nome
+            nomeCliente = task.clienteId.nome;
+        } else {
+            // Fallback
+            nomeCliente = 'Cliente não identificado';
+        }
+
+        return {
+            id: task._id || `TASK-${Math.floor(Math.random() * 9000 + 1000)}`,
+            nome: task.nome,
+            cliente: nomeCliente,
+            avatarUrl: undefined, // Será implementado depois
+            categoria: task.categoria || 'Geral',
+            status: task.status as Projeto['status'],
+            prioridade: task.prioridade as Projeto['prioridade'],
+            dataCriacao: task.dataCriacao ? new Date(task.dataCriacao).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR'),
+            dataEntrega: task.dataEntrega ? new Date(task.dataEntrega).toLocaleDateString('pt-BR') : '',
+            descricao: task.descricao,
+            link: task.link || '',
+            notas: task.notas || '',
+        };
+    });
 
     const projetosFiltrados = filterProjetos(projetos, search, status, prioridade);
 
@@ -83,8 +115,16 @@ const MainApp = () => {
         setPage(prevPage => Math.max(prevPage - 1, 0));
     };
 
-    const handleDeleteProjeto = (id: string) => {
-        setProjetos((prev) => prev.filter((proj) => proj.id !== id));
+    const handleDeleteProjeto = async (id: string) => {
+        if (window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
+            try {
+                await deleteTask(id);
+                // Feedback visual será mostrado automaticamente pelo hook useTasks
+            } catch (err) {
+                console.error('Erro ao deletar tarefa:', err);
+                alert('Erro ao excluir tarefa');
+            }
+        }
     };
 
     function openImageModal(proj: Projeto) {
@@ -97,15 +137,10 @@ const MainApp = () => {
         setShowUploadModal(false);
     }
 
-    function handleFileUpload(url: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    function handleFileUpload(_url: string) {
         if (uploadTargetProjeto) {
-            setProjetos((prev) =>
-                prev.map((p) =>
-                    p.id === uploadTargetProjeto.id
-                        ? { ...p, avatarUrl: url }
-                        : p
-                )
-            );
+            // Por enquanto apenas fechar o modal, implementar upload depois
             closeImageModal();
         }
     }
@@ -126,13 +161,7 @@ const MainApp = () => {
         setModalOpen(true);
     };
 
-    const handleAddOrUpdateProjeto = (projeto: Projeto) => {
-        if (editingTask) {
-            setProjetos(prev => prev.map(p => p.id === projeto.id ? projeto : p));
-        } else {
-            setProjetos(prev => [projeto, ...prev]);
-        }
-    };
+    
 
     return (
         <div className="app flex flex-col min-h-screen bg-background text-foreground p-8 dark">
@@ -175,7 +204,29 @@ const MainApp = () => {
                 </div>
             </div>
             <div className="bg-card rounded-lg shadow p-6 overflow-x-auto">
-                <h2 className="text-xl font-semibold mb-4">Projetos dos Clientes</h2>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold">Projetos dos Clientes</h2>
+                    {loading && (
+                        <div className="text-sm text-[#FFE0C2] flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#FFE0C2]"></div>
+                            Carregando...
+                        </div>
+                    )}
+                </div>
+                
+                {error && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                        <p className="font-bold">Erro:</p>
+                        <p>{error}</p>
+                        <button 
+                            onClick={fetchTasks}
+                            className="mt-2 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        >
+                            Tentar Novamente
+                        </button>
+                    </div>
+                )}
+                
                 <div className="overflow-x-auto">
                     <motion.table
                         className="min-w-full text-sm"
@@ -320,8 +371,9 @@ const MainApp = () => {
                 <ModalNovaTarefa
                     open={modalOpen}
                     onClose={() => { setModalOpen(false); setEditingTask(null); }}
-                    onAdd={handleAddOrUpdateProjeto}
                     editingTask={editingTask}
+                    createTask={createTask}
+                    updateTask={updateTask}
                 />
             )}
 

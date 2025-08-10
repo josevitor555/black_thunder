@@ -1,6 +1,7 @@
 
 // Models for mongodb
 import projects from "../ModelSchemas/ProjectSchema.js";
+import Client from "../ModelSchemas/ClientSchema.js";
 
 // Import mongoose
 import mongoose from "mongoose";
@@ -75,13 +76,17 @@ export const createTask = async (req, res) => {
 
         const tarefaSalva = await novaTarefa.save();
         
-        console.log("Tarefa salva com sucesso:", tarefaSalva);
-        console.log("ID da tarefa salva:", tarefaSalva._id);
+        // Buscar a tarefa criada com o clienteId populado
+        const tarefaComCliente = await projects.findById(tarefaSalva._id)
+            .populate('clienteId', 'nome email');
+        
+        console.log("Tarefa salva com sucesso:", tarefaComCliente);
+        console.log("ID da tarefa salva:", tarefaComCliente._id);
 
         res.status(201).json({
             success: true,
             message: "Tarefa criada com sucesso",
-            data: tarefaSalva
+            data: tarefaComCliente
         });
 
     } catch (error) {
@@ -154,7 +159,7 @@ export const updateTask = async (req, res) => {
             id,
             { ...updateData },
             { new: true, runValidators: true }
-        );
+        ).populate('clienteId', 'nome email');
 
         if (!tarefaAtualizada) {
             return res.status(404).json({
@@ -275,6 +280,114 @@ export const getTaskById = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Erro interno do servidor ao buscar tarefa",
+            error: error.message
+        });
+    }
+};
+
+// 6. Client Management Functions
+
+// Create or find client by name
+export const createOrFindClient = async (req, res) => {
+    try {
+        const { nome, email } = req.body;
+
+        // Validação dos campos obrigatórios
+        if (!nome) {
+            return res.status(400).json({
+                success: false,
+                message: "Nome do cliente é obrigatório"
+            });
+        }
+
+        // Tentar encontrar cliente existente pelo nome
+        let cliente = await Client.findOne({ nome: nome });
+
+        if (!cliente) {
+            // Se não existir, criar novo cliente
+            // Gerar email único se não fornecido
+            const emailCliente = email || `${nome.toLowerCase().replace(/\s+/g, '')}@cliente.local`;
+            
+            cliente = new Client({
+                nome: nome,
+                email: emailCliente
+            });
+
+            await cliente.save();
+            console.log("Novo cliente criado:", cliente);
+        }
+
+        res.json({
+            success: true,
+            message: "Cliente encontrado/criado com sucesso",
+            data: cliente
+        });
+
+    } catch (error) {
+        console.error("Erro ao criar/buscar cliente:", error);
+        res.status(500).json({
+            success: false,
+            message: "Erro interno do servidor ao gerenciar cliente",
+            error: error.message
+        });
+    }
+};
+
+// Get all clients
+export const getAllClients = async (req, res) => {
+    try {
+        const clientes = await Client.find().sort({ nome: 1 });
+
+        res.json({
+            success: true,
+            message: "Clientes recuperados com sucesso",
+            count: clientes.length,
+            data: clientes
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar clientes:", error);
+        res.status(500).json({
+            success: false,
+            message: "Erro interno do servidor ao buscar clientes",
+            error: error.message
+        });
+    }
+};
+
+// Get client by ID
+export const getClientById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validação do ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "ID do cliente inválido"
+            });
+        }
+
+        const cliente = await Client.findById(id);
+
+        if (!cliente) {
+            return res.status(404).json({
+                success: false,
+                message: "Cliente não encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Cliente encontrado com sucesso",
+            data: cliente
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar cliente:", error);
+        res.status(500).json({
+            success: false,
+            message: "Erro interno do servidor ao buscar cliente",
             error: error.message
         });
     }
